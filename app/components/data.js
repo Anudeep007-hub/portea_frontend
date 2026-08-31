@@ -2,6 +2,7 @@ export const API = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 export const DRAFT_KEY = 'portea_frontend_draft';
 export const BOOKINGS_KEY = 'portea_frontend_bookings';
 export const PROFILE_KEY = 'portea_frontend_profile';
+export const SESSION_KEY = 'portea_patient_session';
 export const times = ['9:00 AM', '11:00 AM', '2:00 PM', '5:00 PM'];
 export const timesForDate = (date) => {
   if (!date) return times;
