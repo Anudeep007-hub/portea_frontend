@@ -110,21 +110,25 @@ export default function VisitStep({
         </div>
       )}
 
-      <h3>Who is the visit for?</h3>
-      <div className="choice-row">
-        <Choice
-          active={person === "myself"}
-          onClick={() => setPerson(person === "myself" ? "" : "myself")}
-          title="For myself"
-          text="I need physiotherapy"
-        />
-        <Choice
-          active={person === "family"}
-          onClick={() => setPerson(person === "family" ? "" : "family")}
-          title="For a family member"
-          text="I am booking for someone else"
-        />
-      </div>
+      {!existingBooking && (
+        <>
+          <h3>Who is the visit for?</h3>
+          <div className="choice-row">
+            <Choice
+              active={person === "myself"}
+              onClick={() => setPerson(person === "myself" ? "" : "myself")}
+              title="For myself"
+              text="I need physiotherapy"
+            />
+            <Choice
+              active={person === "family"}
+              onClick={() => setPerson(person === "family" ? "" : "family")}
+              title="For a family member"
+              text="I am booking for someone else"
+            />
+          </div>
+        </>
+      )}
 
       <h3>Choose a service</h3>
       <div className="service-grid">
