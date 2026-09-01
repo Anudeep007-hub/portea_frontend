@@ -73,20 +73,8 @@ export default function DetailsStep({
           error={errors.pincode}
           placeholder="6-digit pincode"
         />
-        <div className="field wide">
-          <label>
-            Upload a prescription, scan or report <small>(optional)</small>
-          </label>
-          <input
-            type="file"
-            accept="image/*,.pdf"
-            onChange={(event) => setFile(event.target.files?.[0] || null)}
-          />
-          <small className="file-note">
-            {file ? file.name : "PDF, JPG or PNG. Maximum 5 MB."}
-          </small>
-          <ErrorMessage text={errors.file} />
-        </div>
+
+
         <div className="field wide">
           <label>
             What would you like help with? <small>(optional)</small>
