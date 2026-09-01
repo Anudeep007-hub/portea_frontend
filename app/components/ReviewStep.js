@@ -24,10 +24,11 @@ export default function ReviewStep({
     ? existingBooking.preferredPhysio
     : preferredPhysio;
   const serviceName = service?.name || existingBooking?.service || "Selected service";
+  const hasUsableService = Boolean(service) || Boolean(existingBooking) || serviceName !== "Selected service";
   const servicePrice = Number(service?.price ?? existingBooking?.total ?? 0);
   const totalPrice = servicePrice * (Number(pack) || 1);
   const isFreeBooking = addingSession || !service || servicePrice <= 0 || totalPrice <= 0;
-  const confirmDisabled = saving || (!isFreeBooking && !payment) || (!addingSession && !service);
+  const confirmDisabled = saving || (!isFreeBooking && !payment) || (!hasUsableService && !addingSession);
   const confirmLabel = isFreeBooking
     ? "Confirm"
     : payment === "cod"
