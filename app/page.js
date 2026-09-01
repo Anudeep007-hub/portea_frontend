@@ -681,7 +681,14 @@ export default function Home() {
     setForm(blank);
     setProfile({});
     setBookings([]);
-    goHome();
+    setBooking(null);
+    setStep(1);
+    setOtp("");
+    setSentOtp("");
+    setMessage("");
+    setPersonRef("");
+    setLoginDestination("book");
+    setView("login");  // Directly show login without waiting for state update
   };
   const headerProps = {
     onHome: goHome,

@@ -4,5 +4,8 @@
   "devCommand": "vite",
   "env": {
     "VITE_API_URL": "https://portea-backend-1.onrender.com"
-  }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
