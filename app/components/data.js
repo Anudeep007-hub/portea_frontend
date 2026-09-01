@@ -22,26 +22,7 @@ export const timesForDate = (date) => {
     return value >= now && value <= end;
   });
 };
-// export const services = [
-//   {
-//     id: 1,
-//     name: "Back and neck pain",
-//     detail: "Pain, stiffness or posture support",
-//     price: 799,
-//   },
-//   {
-//     id: 2,
-//     name: "Post-surgery recovery",
-//     detail: "Safe support after an operation",
-//     price: 999,
-//   },
-//   {
-//     id: 3,
-//     name: "Elderly mobility",
-//     detail: "Strength, balance and fall prevention",
-//     price: 899,
-//   },
-// ];
+
 
 export const fetchServices = async () => {
   const response = await fetch(`${API}/services`);
@@ -59,6 +40,16 @@ export const fetchServices = async () => {
     detail: service.description,
     price: service.price_per_session,
   }));
+};
+
+export const fetchPhysios = async () => {
+  const response = await fetch(`${API}/physios`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch physiotherapists: ${response.status}`);
+  }
+
+  return response.json();
 };
 
 

@@ -17,6 +17,7 @@ import {
   SESSION_KEY,
   dateText,
   fetchServices,
+  fetchPhysios,
   timesForDate,
 } from "./components/data";
 
@@ -96,6 +97,7 @@ export default function Home() {
   const [rescheduleMode, setRescheduleMode] = useState(null);
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleTime, setRescheduleTime] = useState("");
+
 
   useEffect(() => {
     try {
@@ -180,25 +182,54 @@ export default function Home() {
   useEffect(() => {
     if (view === "bookings" || view === "appointments") syncBookingStatuses();
   }, [view, session]);
+
+  // useEffect(() => {
+  //   if (physioChoice !== "PREFERRED_PHYSIO" || existingBooking) return;
+  //   setLoadingPhysios(true);
+  //   fetch(`${API}/physios`)
+  //     .then((response) => (response.ok ? response.json() : Promise.reject()))
+  //     .then((data) => setPhysios(data))
+  //     .catch(() => setPhysios(demoPhysios))
+  //     .finally(() => setLoadingPhysios(false));
+  // }, [physioChoice, existingBooking]);
+
+
+  // useEffect(() => {
+  //   if (physioChoice !== "PREFERRED_PHYSIO" || !preferredPhysio) {
+  //     setAvailability(null);
+  //     return;
+  //   }
+  //   fetch(`${API}/physios/${preferredPhysio.person_ref}/availability?days=90`)
+  //     .then((response) => (response.ok ? response.json() : Promise.reject()))
+  //     .then(setAvailability)
+  //     .catch(() => setAvailability(demoAvailability()));
+  // }, [physioChoice, preferredPhysio]);
+
   useEffect(() => {
-    if (physioChoice !== "PREFERRED_PHYSIO" || existingBooking) return;
-    setLoadingPhysios(true);
-    fetch(`${API}/physios`)
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((data) => setPhysios(data))
-      .catch(() => setPhysios(demoPhysios))
-      .finally(() => setLoadingPhysios(false));
-  }, [physioChoice, existingBooking]);
-  useEffect(() => {
-    if (physioChoice !== "PREFERRED_PHYSIO" || !preferredPhysio) {
-      setAvailability(null);
-      return;
-    }
-    fetch(`${API}/physios/${preferredPhysio.person_ref}/availability?days=90`)
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then(setAvailability)
-      .catch(() => setAvailability(demoAvailability()));
-  }, [physioChoice, preferredPhysio]);
+  if (physioChoice !== "PREFERRED_PHYSIO" || existingBooking) return;
+
+  setLoadingPhysios(true);
+
+  fetch(`${API}/physios`)
+    .then((response) => {
+      console.log("Physios response:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`Physios API failed: ${response.status}`);
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Physios from API:", data);
+      setPhysios(data);
+    })
+    .catch((error) => {
+      console.error("Physios fetch error:", error);
+      setPhysios([]);
+    })
+    .finally(() => setLoadingPhysios(false));
+}, [physioChoice, existingBooking]);
 
   const authHeaders = () =>
     session?.token ? { Authorization: `Bearer ${session.token}` } : {};
