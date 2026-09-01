@@ -23,13 +23,17 @@ export default function ReviewStep({
   const bookingPhysio = addingSession
     ? existingBooking.preferredPhysio
     : preferredPhysio;
+  const serviceName = service?.name || existingBooking?.service || "Selected service";
+  const servicePrice = Number(service?.price || 0);
+  const totalPrice = servicePrice * (Number(pack) || 1);
+
   return (
     <section>
       <Back onClick={onBack} />
       <h2>Check your booking</h2>
       <p className="subtext">Please check the details before confirming.</p>
       <div className="review">
-        <Row label="Service" value={service.name} />
+        <Row label="Service" value={serviceName} />
         <Row
           label="Physiotherapist"
           value={
@@ -66,7 +70,7 @@ export default function ReviewStep({
           value={
             addingSession
               ? existingBooking.reference
-              : money(service.price * pack)
+              : money(totalPrice)
           }
         />
         {addingSession ? (
@@ -79,7 +83,7 @@ export default function ReviewStep({
             <Row label="Travel and service fee" value="Included" />
             <div className="total">
               <b>Total to pay</b>
-              <strong>{money(service.price * pack)}</strong>
+              <strong>{money(totalPrice)}</strong>
             </div>
           </>
         )}
@@ -119,7 +123,7 @@ export default function ReviewStep({
             ? "Book another session"
             : payment === "cod"
               ? "Book with cash on delivery"
-              : `Pay ${money(service.price * pack)} and book`}
+              : `Pay ${money(totalPrice)} and book`}
       </button>
       {payment === "online" && !addingSession && (
         <p className="payment-note">
