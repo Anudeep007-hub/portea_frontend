@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "vite",
+  "env": {
+    "VITE_API_URL": "https://portea-backend-1.onrender.com"
+  }
+}
