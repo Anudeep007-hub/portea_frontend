@@ -16,7 +16,7 @@ import {
   PROFILE_KEY,
   SESSION_KEY,
   dateText,
-  services,
+  fetchServices,
   timesForDate,
 } from "./components/data";
 
@@ -810,21 +810,36 @@ export default function Home() {
     setRescheduleTime("");
     setMessage("Choose a new date and time below.");
   };
-  const chooseExisting = (item) => {
-    const match = services.find(
-      (serviceItem) => serviceItem.name === item.service,
-    );
-    setExistingBooking(item);
-    setService(match || null);
-    setPack(1);
-    setPayment("");
-    setPhysioChoice(item.physioChoice || "PORTEA_ASSIGNS");
-    setPreferredPhysio(item.preferredPhysio || null);
-    setStep(1);
-    setMessage(
-      `${item.reference} selected. This session will not charge you again.`,
-    );
-  };
+
+  const [services, setServices] = useState([]);
+
+useEffect(() => {
+  fetchServices()
+    .then(setServices)
+    .catch((error) => {
+      console.error("Failed to load services:", error);
+    });
+}, []);
+
+
+const chooseExisting = (item, services) => {
+  const match = services.find(
+    (serviceItem) => serviceItem.name === item.service,
+  );
+
+  setExistingBooking(item);
+  setService(match || null);
+  setPack(1);
+  setPayment("");
+  setPhysioChoice(item.physioChoice || "PORTEA_ASSIGNS");
+  setPreferredPhysio(item.preferredPhysio || null);
+  setStep(1);
+  setMessage(
+    `${item.reference} selected. This session will not charge you again.`,
+  );
+};
+
+
   const scheduleNextSession = (item) => {
     chooseExisting(item);
     setDate("");

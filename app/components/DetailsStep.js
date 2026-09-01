@@ -5,8 +5,6 @@ export default function DetailsStep({
   form,
   update,
   errors,
-  file,
-  setFile,
   onBack,
   onNext,
 }) {

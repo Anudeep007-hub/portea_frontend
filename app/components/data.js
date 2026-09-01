@@ -22,27 +22,47 @@ export const timesForDate = (date) => {
     return value >= now && value <= end;
   });
 };
-export const services = [
-  {
-    id: 1,
-    name: "Back and neck pain",
-    detail: "Pain, stiffness or posture support",
-    price: 799,
-  },
-  {
-    id: 2,
-    name: "Post-surgery recovery",
-    detail: "Safe support after an operation",
-    price: 999,
-  },
-  {
-    id: 3,
-    name: "Elderly mobility",
-    detail: "Strength, balance and fall prevention",
-    price: 899,
-  },
-];
-export const packages = [1, 5, 10];
+// export const services = [
+//   {
+//     id: 1,
+//     name: "Back and neck pain",
+//     detail: "Pain, stiffness or posture support",
+//     price: 799,
+//   },
+//   {
+//     id: 2,
+//     name: "Post-surgery recovery",
+//     detail: "Safe support after an operation",
+//     price: 999,
+//   },
+//   {
+//     id: 3,
+//     name: "Elderly mobility",
+//     detail: "Strength, balance and fall prevention",
+//     price: 899,
+//   },
+// ];
+
+export const fetchServices = async () => {
+  const response = await fetch(`${API}/services`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch services");
+  }
+
+  const data = await response.json();
+
+  return data.map((service) => ({
+    id: service.id,
+    slug: service.slug,
+    name: service.name,
+    detail: service.description,
+    price: service.price_per_session,
+  }));
+};
+
+
+export const packages = [1,2,3,4,5,6,7,8,9,10];
 export const dateFor = (days) => new Date(Date.now() + days * 86400000);
 export const dateKey = (date) => {
   const year = date.getFullYear();

@@ -1,9 +1,11 @@
 import Calendar from "./Calendar";
+import { useEffect, useState } from "react";
 import { ErrorMessage } from "./Common";
-import { money, packages, services, timesForDate } from "./data";
+import { money, packages, fetchServices, timesForDate } from "./data";
 
 const activeStatuses = ["Waiting for confirmation", "Confirmed", "Scheduled"];
 const unusedStatuses = ["Not scheduled", "Cancelled"];
+
 
 function packageState(item) {
   const sessions = item.sessions || [];
@@ -44,6 +46,22 @@ export default function VisitStep({
   loadingPhysios,
   availability,
 }) {
+
+  const [services, setServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  useEffect(() => {
+    fetchServices()
+      .then(setServices)
+      .catch((error) => {
+        console.error("Failed to load services:", error);
+      })
+      .finally(() => {
+        setLoadingServices(false);
+      });
+  }, []);
+
+
   const packagesToShow = bookings.filter(
     (item) => item.status !== "Cancelled" && packageState(item).left > 0,
   );
@@ -131,26 +149,34 @@ export default function VisitStep({
       )}
 
       <h3>Choose a service</h3>
+
+
       <div className="service-grid">
-        {services.map((item) => (
-          <button
-            type="button"
-            key={item.id}
-            disabled={Boolean(existingBooking)}
-            className={`service ${service?.id === item.id ? "selected" : ""} ${existingBooking ? "locked" : ""}`}
-            onClick={() => {
-              if (!existingBooking) {
-                setService(service?.id === item.id ? null : item);
-              }
-            }}
-          >
-            <span className="service-mark">+</span>
-            <b>{item.name}</b>
-            <span>{item.detail}</span>
-            <em>From {money(item.price)} / visit</em>
-          </button>
-        ))}
+        {loadingServices ? (
+          <p>Loading services...</p>
+        ) : (
+          services.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              disabled={Boolean(existingBooking)}
+              className={`service ${service?.id === item.id ? "selected" : ""
+                } ${existingBooking ? "locked" : ""}`}
+              onClick={() => {
+                if (!existingBooking) {
+                  setService(service?.id === item.id ? null : item);
+                }
+              }}
+            >
+              <span className="service-mark">+</span>
+              <b>{item.name}</b>
+              <span>{item.detail}</span>
+              <em>From {money(item.price)} / visit</em>
+            </button>
+          ))
+        )}
       </div>
+
       <ErrorMessage text={errors.service} />
 
       <h3>How many sessions?</h3>
