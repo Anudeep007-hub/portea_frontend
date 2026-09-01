@@ -1,6 +1,10 @@
 {
   "name": "portea-booking-frontend",
   "private": true,
+
+  "optionalDependencies": {
+  "@rolldown/binding-win32-x64-msvc": "false"
+},
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -14,5 +18,6 @@
     "@vitejs/plugin-react": "4.3.4",
     "@rolldown/binding-win32-x64-msvc": "1.2.6",
     "vite": "6.4.1"
-  }
+  },
+
 }
