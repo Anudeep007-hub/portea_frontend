@@ -414,6 +414,7 @@ export default function Home() {
       total: 0,
       status: existingBooking.status,
       existing: true,
+      service: existingBooking.service || service?.name || "Selected service",
     });
     localStorage.removeItem(DRAFT_KEY);
     setSaving(false);
@@ -475,11 +476,12 @@ export default function Home() {
         reference: data.booking_ref,
         total: data.price_total,
         status: "New",
+        service: service?.name || "Selected service",
       };
       const record = {
         ...created,
         packageSize: pack,
-        service: service.name,
+        service: service?.name || "Selected service",
         date: dateText(new Date(`${date}T12:00:00`)),
         time,
         patient: form.name,
@@ -1100,6 +1102,13 @@ function Success({
   onHome,
   onBookings,
 }) {
+  if (!booking) return null;
+
+  const serviceName = service?.name || booking?.service || "Selected service";
+  const firstVisit = date
+    ? `${dateText(new Date(`${date}T12:00:00`))}, ${time || ""}`
+    : "Your selected time";
+
   return (
     <>
       <Header
@@ -1125,13 +1134,11 @@ function Success({
           </div>
           <div className="review-row">
             <span>Service</span>
-            <b>{service.name}</b>
+            <b>{serviceName}</b>
           </div>
           <div className="review-row">
             <span>First visit</span>
-            <b>
-              {dateText(new Date(`${date}T12:00:00`))}, {time}
-            </b>
+            <b>{firstVisit}</b>
           </div>
         </div>
         <p className="redirect">
