@@ -235,6 +235,15 @@ export default function Home() {
   };
   const validateDetails = () => {
     const next = {};
+
+    if (!existingBooking && !service) {
+      setStep(1);
+      setMessage("Please choose the care you need before continuing.");
+      setErrors((current) => ({ ...current, service: "Please choose the care you need." }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return false;
+    }
+
     const phone = (form.phone || "").replace(/\s/g, "");
     if (!form.name || form.name.trim().length < 2)
       next.name = "Enter the patient’s full name.";
@@ -339,19 +348,28 @@ export default function Home() {
 
   const createExistingSession = async () => {
     setSaving(true);
+    setMessage("");
+
     const sessions = existingBooking.sessions || [];
-    const nextIndex = sessions.findIndex((session) =>
-      ["Not scheduled", "Cancelled"].includes(session.status),
-    );
-    const sessionNumber =
-      nextIndex >= 0 ? sessions[nextIndex].number : sessions.length + 1;
+    const packageSize = Number(existingBooking.packageSize || sessions.length || 1);
+    const nextEligibleSession = (() => {
+      for (let number = 1; number <= packageSize; number += 1) {
+        const match = sessions.find((session) => Number(session.number) === number);
+        if (!match || ["Not scheduled", "Cancelled"].includes(match.status)) {
+          return number;
+        }
+      }
+      return Math.max(...sessions.map((session) => Number(session.number) || 0), 0) + 1;
+    })();
+
     const session = {
-      number: sessionNumber,
+      number: nextEligibleSession,
       isoDate: date,
       date: dateText(new Date(`${date}T12:00:00`)),
       time,
       status: "Waiting for confirmation",
     };
+
     try {
       const response = await fetch(
         `${API}/bookings/${existingBooking.reference}/appointments`,
@@ -359,7 +377,7 @@ export default function Home() {
           method: "POST",
           headers: { "Content-Type": "application/json", ...authHeaders() },
           body: JSON.stringify({
-            session_number: sessionNumber,
+            session_number: nextEligibleSession,
             start_at: toAppointmentIso(date, time),
             duration_minutes: 45,
           }),
@@ -373,17 +391,24 @@ export default function Home() {
       setSaving(false);
       return;
     }
+
     setBookings((current) => {
       const next = current.map((item) => {
         if (item.reference !== existingBooking.reference) return item;
         const updated = [...(item.sessions || [])];
-        if (nextIndex >= 0) updated[nextIndex] = session;
+        const existingIndex = updated.findIndex(
+          (itemSession) => Number(itemSession.number) === nextEligibleSession,
+        );
+
+        if (existingIndex >= 0) updated[existingIndex] = session;
         else updated.push(session);
+
         return { ...item, sessions: updated };
       });
       localStorage.setItem(BOOKINGS_KEY, JSON.stringify(next));
       return next;
     });
+
     setBooking({
       reference: existingBooking.reference,
       total: 0,

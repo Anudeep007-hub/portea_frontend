@@ -35,6 +35,19 @@ export default function ReviewStep({
       ? "Book with cash on delivery"
       : `Pay ${money(totalPrice)} and book`;
 
+  if (!hasUsableService && !addingSession) {
+    return (
+      <section>
+        <Back onClick={onBack} />
+        <h2>Check your booking</h2>
+        <p className="subtext">Please choose a service before continuing.</p>
+        <div className="message" role="status">
+          Please choose the care you need before continuing.
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section>
       <Back onClick={onBack} />
