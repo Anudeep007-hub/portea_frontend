@@ -7,6 +7,7 @@ import BookingsPanel from "./components/BookingsPanel";
 import ProfilePanel from "./components/ProfilePanel";
 import AppointmentsPanel from "./components/AppointmentsPanel";
 import LoginPanel from "./components/LoginPanel";
+import Calendar from "./components/Calendar";
 import { Progress } from "./components/Common";
 import {
   API,
@@ -16,6 +17,7 @@ import {
   SESSION_KEY,
   dateText,
   services,
+  timesForDate,
 } from "./components/data";
 
 const blank = {
@@ -91,6 +93,9 @@ export default function Home() {
   const [redirectIn, setRedirectIn] = useState(0);
   const [session, setSession] = useState(null);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [rescheduleMode, setRescheduleMode] = useState(null);
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
 
   useEffect(() => {
     try {
@@ -762,50 +767,12 @@ export default function Home() {
     });
     setMessage("Session cancelled. You can now schedule another session.");
   };
-  const rescheduleSession = async (reference, number, sessionChange) => {
-    const bookingToUpdate = bookings.find(
-      (item) => item.reference === reference,
-    );
-    const session = bookingToUpdate?.sessions?.find(
-      (item) => item.number === number,
-    );
-    if (
-      !session ||
-      !canManageSession(session) ||
-      !sessionChange.isoDate ||
-      !sessionChange.time
-    )
-      return;
-    if (session.apptRef) {
-      try {
-        const response = await fetch(
-          `${API}/appointments/${session.apptRef}/reschedule`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json", ...authHeaders() },
-            body: JSON.stringify({
-              session_number: number,
-              start_at: toAppointmentIso(
-                sessionChange.isoDate,
-                sessionChange.time,
-              ),
-              duration_minutes: 45,
-            }),
-          },
-        );
-        if (!response.ok) throw new Error(await apiError(response));
-      } catch (error) {
-        setMessage(error.message || "We could not reschedule this session.");
-        return;
-      }
-    }
-    setBookings((current) => {
-      const next = current.map((item) =>
-        item.reference !== reference
-          ? item
-          : {
-              ...item,
-              sessions: item.sessions.map((itemSession) =>
+  const rescheduleSession = (reference, number, sessionChange) => {
+    setRescheduleMode({ reference, number, current: sessionChange });
+    setRescheduleDate("");
+    setRescheduleTime("");
+    setMessage("Choose a new date and time below.");
+  };
                 itemSession.number === number
                   ? {
                       ...itemSession,
@@ -848,7 +815,91 @@ export default function Home() {
     setAvailability(null);
     setMessage("Starting a new package booking.");
   };
-  if (view === "appointments")
+  const submitReschedule = async () => {
+    if (!rescheduleMode || !rescheduleDate || !rescheduleTime) {
+      setMessage("Please select a new date and time.");
+      return;
+    }
+    const { reference, number } = rescheduleMode;
+    const bookingToUpdate = bookings.find(
+      (item) => item.reference === reference,
+    );
+    const session = bookingToUpdate?.sessions?.find(
+      (item) => item.number === number,
+    );
+    if (!session || !canManageSession(session) || !session.apptRef) {
+      setMessage("This session cannot be rescheduled.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${API}/appointments/${session.apptRef}/reschedule`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", ...authHeaders() },
+          body: JSON.stringify({
+            session_number: number,
+            start_at: toAppointmentIso(rescheduleDate, rescheduleTime),
+            duration_minutes: 45,
+          }),
+        },
+      );
+      if (!response.ok) throw new Error(await apiError(response));
+      setMessage("Session rescheduled! Our team will confirm the new time.");
+      setRescheduleMode(null);
+      setRescheduleDate("");
+      setRescheduleTime("");
+      await loadMyBookings();
+    } catch (error) {
+      setMessage(error.message || "Could not reschedule. Please try again.");
+    }
+  };
+  if (view === "appointments") {
+    if (rescheduleMode) {
+      return (
+        <>
+          <Header {...headerProps} />
+          <section className="account-panel">
+            <button className="back" onClick={() => setRescheduleMode(null)}>
+              Back to appointments
+            </button>
+            <h2>Reschedule appointment</h2>
+            <p className="subtext">Pick a new date and time for this session.</p>
+            {message && <p className="message">{message}</p>}
+            <h3>Choose new date</h3>
+            <Calendar
+              selected={rescheduleDate}
+              onSelect={(d) => {
+                setRescheduleDate(d);
+                setRescheduleTime("");
+              }}
+            />
+            {rescheduleDate && (
+              <>
+                <h3>Choose new time</h3>
+                <div className="time-grid">
+                  {timesForDate(rescheduleDate).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      className={`time-option ${rescheduleTime === t ? "selected" : ""}`}
+                      onClick={() => setRescheduleTime(t)}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {rescheduleDate && rescheduleTime && (
+              <button className="primary" onClick={submitReschedule}>
+                Confirm reschedule
+              </button>
+            )}
+          </section>
+        </>
+      );
+    }
     return (
       <>
         <Header {...headerProps} />

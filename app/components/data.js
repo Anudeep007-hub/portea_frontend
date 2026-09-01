@@ -44,7 +44,12 @@ export const services = [
 ];
 export const packages = [1, 5, 10];
 export const dateFor = (days) => new Date(Date.now() + days * 86400000);
-export const dateKey = (date) => date.toISOString().slice(0, 10);
+export const dateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 export const dateText = (date) =>
   date.toLocaleDateString("en-IN", {
     weekday: "short",

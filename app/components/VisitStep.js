@@ -135,8 +135,9 @@ export default function VisitStep({
             disabled={Boolean(existingBooking)}
             className={`service ${service?.id === item.id ? "selected" : ""} ${existingBooking ? "locked" : ""}`}
             onClick={() => {
-              onNewPackage();
-              setService(service?.id === item.id ? null : item);
+              if (!existingBooking) {
+                setService(service?.id === item.id ? null : item);
+              }
             }}
           >
             <span className="service-mark">+</span>
@@ -157,8 +158,9 @@ export default function VisitStep({
             disabled={Boolean(existingBooking)}
             className={`${pack === number ? "selected" : ""} ${existingBooking ? "locked" : ""}`}
             onClick={() => {
-              onNewPackage();
-              setPack(pack === number ? 0 : number);
+              if (!existingBooking) {
+                setPack(pack === number ? 0 : number);
+              }
             }}
           >
             <b>

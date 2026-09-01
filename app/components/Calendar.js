@@ -26,12 +26,18 @@ export default function Calendar({
       : new Date(month.getFullYear(), month.getMonth(), index - startDay + 1),
   );
   const isAvailable = (date) => {
-    const tomorrow = new Date();
-    tomorrow.setHours(0, 0, 0, 0);
+    // Use local date to avoid timezone issues
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     // Same-day visits are not offered. The backend also requires 3 hours' notice.
-    if (!date || date < tomorrow) return false;
+    if (!date) return false;
+    
+    const dateOnly = new Date(date);
+    dateOnly.setHours(0, 0, 0, 0);
+    if (dateOnly < tomorrow) return false;
 
     const key = dateKey(date);
     return availableDates

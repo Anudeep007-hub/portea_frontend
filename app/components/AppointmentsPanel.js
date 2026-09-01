@@ -39,7 +39,10 @@ export default function AppointmentsPanel({
                   type="button"
                   className="action-button reschedule-button"
                   onClick={() =>
-                    onReschedule(item.booking.reference, item.number, item)
+                    onReschedule(item.booking.reference, item.number, {
+                      isoDate: item.isoDate,
+                      time: item.time,
+                    })
                   }
                 >
                   Reschedule
