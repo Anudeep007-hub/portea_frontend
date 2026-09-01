@@ -26,6 +26,12 @@ export default function ReviewStep({
   const serviceName = service?.name || existingBooking?.service || "Selected service";
   const servicePrice = Number(service?.price || 0);
   const totalPrice = servicePrice * (Number(pack) || 1);
+  const confirmDisabled = saving || (!addingSession && !payment) || (!addingSession && !service);
+  const confirmLabel = addingSession
+    ? "Confirm"
+    : payment === "cod"
+      ? "Book with cash on delivery"
+      : `Pay ${money(totalPrice)} and book`;
 
   return (
     <section>
@@ -114,16 +120,10 @@ export default function ReviewStep({
       </p>
       <button
         className="primary"
-        disabled={saving || (!addingSession && !payment) || (!addingSession && !service)}
+        disabled={confirmDisabled}
         onClick={onBook}
       >
-        {saving
-          ? "Confirming booking..."
-          : addingSession
-            ? "Book another session"
-            : payment === "cod"
-              ? "Book with cash on delivery"
-              : `Pay ${money(totalPrice)} and book`}
+        {saving ? "Confirming booking..." : confirmLabel}
       </button>
       {payment === "online" && !addingSession && (
         <p className="payment-note">

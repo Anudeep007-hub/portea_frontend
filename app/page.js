@@ -790,6 +790,7 @@ export default function Home() {
     setExistingBooking(item);
     setService(match || null);
     setPack(1);
+    setPayment("");
     setPhysioChoice(item.physioChoice || "PORTEA_ASSIGNS");
     setPreferredPhysio(item.preferredPhysio || null);
     setStep(1);
@@ -805,6 +806,7 @@ export default function Home() {
   };
   const startNewPackage = () => {
     setExistingBooking(null);
+    setPayment("");
     setPhysioChoice("PORTEA_ASSIGNS");
     setPreferredPhysio(null);
     setAvailability(null);
