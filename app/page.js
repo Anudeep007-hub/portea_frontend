@@ -220,10 +220,11 @@ export default function Home() {
   };
   const validateVisit = () => {
     const next = {};
-    if (!person) next.person = "Choose who the visit is for.";
-    if (!service) next.service = "Please choose the care you need.";
-    if (!pack) next.pack = "Choose a session option.";
-    if (physioChoice === "PREFERRED_PHYSIO" && !preferredPhysio)
+    if (!existingBooking && !person) next.person = "Choose who the visit is for.";
+    if (!existingBooking && !service)
+      next.service = "Please choose the care you need.";
+    if (!existingBooking && !pack) next.pack = "Choose a session option.";
+    if (!existingBooking && physioChoice === "PREFERRED_PHYSIO" && !preferredPhysio)
       next.physio = "Choose your preferred physiotherapist.";
     if (!date) next.date = "Choose an available date.";
     if (!time) next.time = "Please choose a time.";
