@@ -24,10 +24,11 @@ export default function ReviewStep({
     ? existingBooking.preferredPhysio
     : preferredPhysio;
   const serviceName = service?.name || existingBooking?.service || "Selected service";
-  const servicePrice = Number(service?.price || 0);
+  const servicePrice = Number(service?.price ?? existingBooking?.total ?? 0);
   const totalPrice = servicePrice * (Number(pack) || 1);
-  const confirmDisabled = saving || (!addingSession && !payment) || (!addingSession && !service);
-  const confirmLabel = addingSession
+  const isFreeBooking = addingSession || !service || servicePrice <= 0 || totalPrice <= 0;
+  const confirmDisabled = saving || (!isFreeBooking && !payment) || (!addingSession && !service);
+  const confirmLabel = isFreeBooking
     ? "Confirm"
     : payment === "cod"
       ? "Book with cash on delivery"
@@ -94,7 +95,7 @@ export default function ReviewStep({
           </>
         )}
       </div>
-      {!addingSession && (
+      {!isFreeBooking && (
         <div className="payment-choice">
           <h3>How would you like to pay?</h3>
           <button
