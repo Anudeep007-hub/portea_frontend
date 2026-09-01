@@ -101,9 +101,23 @@ export default function OpsApp() {
       );
     }
 
-    return dashboard.physios.filter(
+    const samePincode = dashboard.physios.filter(
       (physio) => physio.service_pincode === appointment.pincode,
     );
+
+    if (samePincode.length > 0) {
+      return samePincode;
+    }
+
+    const cleanPincode = (value) => Number(String(value || '').replace(/\D/g, '')) || 0;
+    const target = cleanPincode(appointment.pincode);
+
+    return [...dashboard.physios]
+      .sort((a, b) => {
+        const diffA = Math.abs(cleanPincode(a.service_pincode) - target);
+        const diffB = Math.abs(cleanPincode(b.service_pincode) - target);
+        return diffA - diffB || a.name.localeCompare(b.name);
+      });
   }
 
   async function confirmAppointment(appointment) {
@@ -208,11 +222,11 @@ export default function OpsApp() {
             {appointments.map((appointment) => {
               const physios = availablePhysios(appointment);
               const isPreferred = appointment.physio_choice === 'PREFERRED_PHYSIO';
-              const isPending = appointment.status === 'Pending';
+              const needsOpsAction = appointment.status === 'Pending' || !appointment.physio_id;
 
               return <article className="ops-appointment-card" key={appointment.appt_ref}>
                 <div className="ops-appointment-main">
-                  <span className={`status ${isPending ? '' : 'confirmed'}`}>{isPending ? 'Waiting for OPS' : 'Confirmed'}</span>
+                  <span className={`status ${needsOpsAction ? '' : 'confirmed'}`}>{needsOpsAction ? 'Waiting for OPS' : 'Confirmed'}</span>
                   <h3>{appointment.patient_name}</h3>
                   <p>{appointment.patient_phone} · {appointment.service_name}</p>
                   <p><b>{formatDateTime(appointment.start_at)}</b> · Session {appointment.session_number}</p>
@@ -221,7 +235,7 @@ export default function OpsApp() {
                   <small>Booking: {appointment.booking_ref} · Appointment: {appointment.appt_ref}</small>
                 </div>
 
-                {isPending ? <div className="ops-confirm-box">
+                {needsOpsAction ? <div className="ops-confirm-box">
                   <label>Physiotherapist</label>
                   {isPreferred ? <p className="preferred-physio">Patient selected {appointment.preferred_physio_name}. This cannot be changed.</p> : (
                     <select
@@ -235,7 +249,7 @@ export default function OpsApp() {
                       {physios.map((physio) => <option key={physio.person_ref} value={physio.person_ref}>{physio.name} — {physio.specialization}</option>)}
                     </select>
                   )}
-                  {!isPreferred && physios.length === 0 && <p className="ops-warning">No active physio serves this pincode yet.</p>}
+                  {!isPreferred && physios.length === 0 && <p className="ops-warning">No active physio serves this pincode yet. Showing nearest available physios instead.</p>}
                   <button className="primary" disabled={loading || (!isPreferred && !selectedPhysios[appointment.appt_ref])} onClick={() => confirmAppointment(appointment)}>Confirm appointment</button>
                 </div> : <div className="ops-confirm-box"><b>This appointment is already confirmed.</b><p className="preferred-physio">No further OPS action is needed.</p></div>}
               </article>;
