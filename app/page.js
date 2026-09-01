@@ -773,21 +773,6 @@ export default function Home() {
     setRescheduleTime("");
     setMessage("Choose a new date and time below.");
   };
-                itemSession.number === number
-                  ? {
-                      ...itemSession,
-                      ...sessionChange,
-                      status: "Waiting for confirmation",
-                    }
-                  : itemSession,
-              ),
-            },
-      );
-      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(next));
-      return next;
-    });
-    setMessage("Session rescheduled. Our team will confirm the new time.");
-  };
   const chooseExisting = (item) => {
     const match = services.find(
       (serviceItem) => serviceItem.name === item.service,
@@ -911,6 +896,7 @@ export default function Home() {
         />
       </>
     );
+  }
   if (view === "bookings" || view === "cancelled")
     return (
       <>
