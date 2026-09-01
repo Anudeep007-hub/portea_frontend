@@ -397,6 +397,15 @@ export default function Home() {
 
   const createBooking = async () => {
     if (existingBooking) return createExistingSession();
+    if (!service) {
+      setErrors((current) => ({
+        ...current,
+        service: "Please choose the care you need.",
+      }));
+      setMessage("Please choose the care you need.");
+      setStep(1);
+      return;
+    }
 
     setSaving(true);
 

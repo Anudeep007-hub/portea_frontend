@@ -114,7 +114,7 @@ export default function ReviewStep({
       </p>
       <button
         className="primary"
-        disabled={saving || (!addingSession && !payment)}
+        disabled={saving || (!addingSession && !payment) || (!addingSession && !service)}
         onClick={onBook}
       >
         {saving

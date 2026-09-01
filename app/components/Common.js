@@ -6,10 +6,20 @@ export function ErrorMessage({ text }) {
   ) : null;
 }
 export function Field({ label, error, wide, ...props }) {
+  const hasValue =
+    props.value !== undefined &&
+    props.value !== null &&
+    String(props.value).trim() !== "";
+
   return (
-    <div className={`field ${wide ? "wide" : ""}`}>
+    <div className={`field ${wide ? "wide" : ""} ${error ? "has-error" : ""} ${hasValue ? "filled" : ""}`}>
       <label>{label}</label>
-      <input {...props} /> <ErrorMessage text={error} />
+      <input
+        {...props}
+        aria-invalid={Boolean(error)}
+        className={`${props.className || ""} ${error ? "input-error" : ""} ${hasValue ? "input-filled" : ""}`.trim()}
+      />
+      <ErrorMessage text={error} />
     </div>
   );
 }
