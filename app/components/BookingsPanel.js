@@ -146,7 +146,7 @@ function BookingCard({
             );
           })}
         </div>
-        {canScheduleNext && (
+        {/* {canScheduleNext && (
           <button
             type="button"
             className="action-button reschedule-button"
@@ -154,7 +154,7 @@ function BookingCard({
           >
             Schedule next session
           </button>
-        )}
+        )} */}
         {editing && (
           <div className="reschedule">
             <Calendar

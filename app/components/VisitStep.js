@@ -66,7 +66,11 @@ export default function VisitStep({
     (item) => item.status !== "Cancelled" && packageState(item).left > 0,
   );
   const isPreferredBooking = physioChoice === "PREFERRED_PHYSIO";
-  const availableDates = isPreferredBooking ? availability?.dates || [] : null;
+  const availableDates = isPreferredBooking
+    ? availability?.dates?.length
+      ? availability.dates
+      : null
+    : null;
   const availableTimes = isPreferredBooking
     ? availability?.slots?.[date] || []
     : timesForDate(date);

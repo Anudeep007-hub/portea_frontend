@@ -194,16 +194,16 @@ export default function Home() {
   // }, [physioChoice, existingBooking]);
 
 
-  // useEffect(() => {
-  //   if (physioChoice !== "PREFERRED_PHYSIO" || !preferredPhysio) {
-  //     setAvailability(null);
-  //     return;
-  //   }
-  //   fetch(`${API}/physios/${preferredPhysio.person_ref}/availability?days=90`)
-  //     .then((response) => (response.ok ? response.json() : Promise.reject()))
-  //     .then(setAvailability)
-  //     .catch(() => setAvailability(demoAvailability()));
-  // }, [physioChoice, preferredPhysio]);
+  useEffect(() => {
+    if (physioChoice !== "PREFERRED_PHYSIO" || !preferredPhysio) {
+      setAvailability(null);
+      return;
+    }
+    fetch(`${API}/physios/${preferredPhysio.person_ref}/availability?days=90`)
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then(setAvailability)
+      .catch(() => setAvailability(demoAvailability()));
+  }, [physioChoice, preferredPhysio]);
 
   useEffect(() => {
   if (physioChoice !== "PREFERRED_PHYSIO" || existingBooking) return;
