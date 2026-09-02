@@ -666,9 +666,8 @@ export default function Home() {
     return records;
   };
   const openBookings = async () => {
-    // Always require OTP verification before viewing bookings
     setLoginDestination("bookings");
-    setView("login");
+    setView(session?.token ? "bookings" : "login");
   };
   const loginSendOtp = async (phone) => {
     setLoginLoading(true);
