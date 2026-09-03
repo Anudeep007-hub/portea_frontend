@@ -25,6 +25,7 @@ const blank = {
   name: "",
   age: "",
   phone: "",
+  patientPhone: "",
   address: "",
   pincode: "",
   condition: "",
@@ -283,6 +284,11 @@ export default function Home() {
       !/^(?:[1-9]|[1-9][0-9]|1[01][0-9]|120)$/.test(String(form.age))
     )
       next.age = "Enter an age from 1 to 120.";
+    if (person === "family" && form.patientPhone) {
+      const patientPhone = form.patientPhone.replace(/\s/g, "");
+      if (!/^[6-9]\d{9}$/.test(patientPhone))
+        next.patientPhone = "Enter a valid 10-digit mobile number.";
+    }
     if (!/^[6-9]\d{9}$/.test(phone))
       next.phone = "Enter a valid 10-digit mobile number.";
     if (!form.address || form.address.trim().length < 8)
@@ -467,8 +473,35 @@ export default function Home() {
     setSaving(true);
 
     try {
+      let targetPatientRef = personRef;
+
+      if (person === "family" && form.patientPhone && form.patientPhone.replace(/\s/g, "")) {
+        const familyPhone = form.patientPhone.replace(/\s/g, "");
+        if (familyPhone !== form.phone.replace(/\s/g, "")) {
+          try {
+            const personRes = await fetch(`${API}/persons`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: form.name,
+                phone: familyPhone,
+                age: Number(form.age) || null,
+              }),
+            });
+            if (personRes.ok) {
+              const personData = await personRes.json();
+              if (personData.person_ref) {
+                targetPatientRef = personData.person_ref;
+              }
+            }
+          } catch (e) {
+            console.error("Could not register family member profile:", e);
+          }
+        }
+      }
+
       const payload = {
-        patient_ref: personRef,
+        patient_ref: targetPatientRef,
         booked_by_ref: personRef,
         service_id: service.id,
         package_size: pack,

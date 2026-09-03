@@ -41,19 +41,38 @@ export default function DetailsStep({
           error={errors.age}
           placeholder="For example, 58"
         />
-        <Field
-          label="Mobile number"
-          type="tel"
-          value={form.phone || ""}
-          readOnly
-          error={errors.phone}
-          placeholder="10-digit mobile number"
-        />
-        <div className="otp-box">
-          <label>Mobile number verified</label>
-          <p className="subtext">You are signed in. No OTP is needed again.</p>
-          <ErrorMessage text={errors.otp} />
-        </div>
+        {person === "family" ? (
+          <>
+            <Field
+              label="Family member's mobile number"
+              type="tel"
+              value={form.patientPhone || ""}
+              onChange={(event) => update("patientPhone", event.target.value.replace(/\D/g, "").slice(0, 10))}
+              error={errors.patientPhone}
+              placeholder="10-digit mobile (optional, defaults to booker)"
+            />
+            <div className="otp-box">
+              <label>Booker (Your Mobile)</label>
+              <p className="subtext">{form.phone || "Signed in"} (Verified)</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <Field
+              label="Mobile number"
+              type="tel"
+              value={form.phone || ""}
+              readOnly
+              error={errors.phone}
+              placeholder="10-digit mobile number"
+            />
+            <div className="otp-box">
+              <label>Mobile number verified</label>
+              <p className="subtext">You are signed in. No OTP is needed again.</p>
+              <ErrorMessage text={errors.otp} />
+            </div>
+          </>
+        )}
         <Field
           wide
           label="Home address"
