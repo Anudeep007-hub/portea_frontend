@@ -97,8 +97,9 @@ export default function VisitStep({
           <div>
             <b>Booking another session</b>
             <span>
-              {existingBooking.reference} · {existingBooking.service} · Choose a
-              new date and time
+              {existingBooking.reference} · {existingBooking.service}
+              {existingBooking.patient ? ` · Patient: ${existingBooking.patient}` : ""}
+              {" · Choose a new date and time"}
             </span>
             {existingBooking.physioChoice === "PREFERRED_PHYSIO" && (
               <small>
@@ -152,62 +153,54 @@ export default function VisitStep({
         </>
       )}
 
-      <h3>Choose a service</h3>
+      {!existingBooking && (
+        <>
+          <h3>Choose a service</h3>
 
+          <div className="service-grid">
+            {loadingServices ? (
+              <p>Loading services...</p>
+            ) : (
+              services.map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={`service ${service?.id === item.id ? "selected" : ""}`}
+                  onClick={() => setService(service?.id === item.id ? null : item)}
+                >
+                  <span className="service-mark">+</span>
+                  <b>{item.name}</b>
+                  <span>{item.detail}</span>
+                  <em>From {money(item.price)} / visit</em>
+                </button>
+              ))
+            )}
+          </div>
 
-      <div className="service-grid">
-        {loadingServices ? (
-          <p>Loading services...</p>
-        ) : (
-          services.map((item) => (
-            <button
-              type="button"
-              key={item.id}
-              disabled={Boolean(existingBooking)}
-              className={`service ${service?.id === item.id ? "selected" : ""
-                } ${existingBooking ? "locked" : ""}`}
-              onClick={() => {
-                if (!existingBooking) {
-                  setService(service?.id === item.id ? null : item);
-                }
-              }}
-            >
-              <span className="service-mark">+</span>
-              <b>{item.name}</b>
-              <span>{item.detail}</span>
-              <em>From {money(item.price)} / visit</em>
-            </button>
-          ))
-        )}
-      </div>
+          <ErrorMessage text={errors.service} />
 
-      <ErrorMessage text={errors.service} />
-
-      <h3>How many sessions?</h3>
-      <div className="package-row">
-        {packages.map((number) => (
-          <button
-            type="button"
-            key={number}
-            disabled={Boolean(existingBooking)}
-            className={`${pack === number ? "selected" : ""} ${existingBooking ? "locked" : ""}`}
-            onClick={() => {
-              if (!existingBooking) {
-                setPack(pack === number ? 0 : number);
-              }
-            }}
-          >
-            <b>
-              {number} {number === 1 ? "session" : "sessions"}
-            </b>
-            <span>
-              {number === 1
-                ? "Start with one visit"
-                : "Schedule the rest later"}
-            </span>
-          </button>
-        ))}
-      </div>
+          <h3>How many sessions?</h3>
+          <div className="package-row">
+            {packages.map((number) => (
+              <button
+                type="button"
+                key={number}
+                className={pack === number ? "selected" : ""}
+                onClick={() => setPack(pack === number ? 0 : number)}
+              >
+                <b>
+                  {number} {number === 1 ? "session" : "sessions"}
+                </b>
+                <span>
+                  {number === 1
+                    ? "Start with one visit"
+                    : "Schedule the rest later"}
+                </span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {!existingBooking && (
         <PhysioChoice

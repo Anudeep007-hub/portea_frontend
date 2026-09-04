@@ -663,6 +663,9 @@ export default function Home() {
       patientPhone: item.patient_phone,
       booker: item.booker_name,
       bookerPhone: item.booker_phone,
+      address: item.address_line,
+      pincode: item.pincode,
+      condition: item.condition_notes,
       physioChoice: item.physio_choice,
       preferredPhysio: item.preferred_physio_ref
         ? {
@@ -885,17 +888,25 @@ useEffect(() => {
 }, []);
 
 
-const chooseExisting = (item, services) => {
-  const match = services.find(
+const chooseExisting = (item) => {
+  const match = (services || []).find(
     (serviceItem) => serviceItem.name === item.service,
   );
 
   setExistingBooking(item);
-  setService(match || null);
-  setPack(1);
+  setService(match || { id: item.service_id, name: item.service, price: 0 });
+  setPack(item.packageSize || 1);
   setPayment("");
   setPhysioChoice(item.physioChoice || "PORTEA_ASSIGNS");
   setPreferredPhysio(item.preferredPhysio || null);
+  setForm((current) => ({
+    ...current,
+    name: item.patient || current.name,
+    phone: item.patientPhone || item.bookerPhone || current.phone,
+    address: item.address || current.address,
+    pincode: item.pincode || current.pincode,
+    condition: item.condition || current.condition,
+  }));
   setStep(1);
   setMessage(
     `${item.reference} selected. This session will not charge you again.`,
@@ -1124,7 +1135,7 @@ const chooseExisting = (item, services) => {
             existingBooking={existingBooking}
             onExisting={chooseExisting}
             onNewPackage={startNewPackage}
-            onNext={() => validateVisit() && goToStep(2)}
+            onNext={() => validateVisit() && goToStep(existingBooking ? 3 : 2)}
             physioChoice={physioChoice}
             setPhysioChoice={choosePhysioMode}
             preferredPhysio={preferredPhysio}
@@ -1159,7 +1170,7 @@ const chooseExisting = (item, services) => {
             physioChoice={physioChoice}
             preferredPhysio={preferredPhysio}
             saving={saving}
-            onBack={() => goToStep(2)}
+            onBack={() => goToStep(existingBooking ? 1 : 2)}
             onBook={createBooking}
             opacity="1"
           />
